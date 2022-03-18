@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>Projet_MySQL</RootNamespace>
     <AssemblyName>Projet_MySQL</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -34,11 +34,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MySql.Data">
-      <HintPath>F:\04-modules-ict\105-SQLTraiterDB\mysql-8.0.27-winx64\mysql-8.0.27-winx64\bin\MySql.Data.dll</HintPath>
+    <Reference Include="MySql.Data, Version=8.0.16.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Properties\References\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Web">
-      <HintPath>F:\04-modules-ict\105-SQLTraiterDB\mysql-8.0.27-winx64\mysql-8.0.27-winx64\bin\MySql.Web.dll</HintPath>
+    <Reference Include="MySql.Web, Version=8.0.16.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Properties\References\MySql.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Mocks, Version=3.6.0.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,6 +58,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Database\dbMethods.cs" />
+    <Compile Include="Ressources\isConn.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>isConn.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Errors\dbErrors.cs" />
     <Compile Include="frmDatabase.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +73,15 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Ressources\isNotConn.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>isNotConn.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Ressources\isConn.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>isConn.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmDatabase.resx">
       <DependentUpon>frmDatabase.cs</DependentUpon>
     </EmbeddedResource>
@@ -74,6 +95,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Ressources\isNotConn.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>isNotConn.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
