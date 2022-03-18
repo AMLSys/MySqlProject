@@ -7,6 +7,9 @@ using System.Resources;
 
 namespace Projet_MySQL
 {
+    /// <summary>
+    /// Main class
+    /// </summary>
     public partial class frmDatabase : Form
     {
         private dbMethods dbMethods = new dbMethods();
@@ -16,16 +19,17 @@ namespace Projet_MySQL
             InitializeComponent();
 
             dbMethods.rm = new ResourceManager(typeof(isNotConn));
+            dbMethods.Disconnect(this);
         }
 
         /// <summary>
         /// Connect the user to the mysql database
-        /// <!--TODO-->
         /// </summary>
         /// <param name="sender">Sender</param>
         /// <param name="e">E</param>
         private void btnConnect_Click(object sender, EventArgs e)
         {
+            //Create a connection
             if (!string.IsNullOrEmpty(txtNomDb.Text))
             {
                 dbMethods.CreateAConnection(txtNomDb.Text);
@@ -85,14 +89,10 @@ namespace Projet_MySQL
                     }; 
                 }
                 else
-                {
                     dbErrors.ShowEmpty();
-                }
             }
             else
-            {
                 dbErrors.ShowConnected();
-            }
         }
 
         /// <summary>
@@ -122,14 +122,10 @@ namespace Projet_MySQL
                         };
                 }
                 else
-                {
                     dbErrors.ShowEmpty();
-                }
             }
             else
-            {
                 dbErrors.ShowConnected();
-            }
         }
 
 
@@ -178,15 +174,17 @@ namespace Projet_MySQL
             if (dbMethods.isConnected == true)
             {
                 dgvData.Columns.AddRange(dbMethods.CreateATable());
+                btnFinaliser.Enabled = true;
+                btnAddRow.Enabled = true;
+                btnDeleteRow.Enabled = true;
+                dbMethods.canCreate = true;
             }
+            //Show an error
             else
-            {
                 dbErrors.ShowConnected();
-            }
         }
 
         /// <summary>
-        /// <<!--TODO-->
         /// Finalise the creation of the table
         /// </summary>
         /// <param name="sender">Sender</param>
@@ -210,47 +208,46 @@ namespace Projet_MySQL
                     //Reach the rows of the data view
                     foreach (DataGridViewRow row in dgvData.Rows)
                     {
-                        //Reach the cells in the rows
-                        foreach (DataGridViewCell cell in row.Cells)
+                    //Reach the cells in the rows
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        try
                         {
-                            try
+                            Type cellType = cell.Value.GetType();
+
+                            //If a "ID" checkbox is checked
+                            if (cellType.Equals(typeof(bool)) && cell.ColumnIndex == 4 && (bool)cell.Value == true)
                             {
-                                Type cellType = cell.Value.GetType();
-
-                                //If a "ID" checkbox is checked
-                                if (cellType.Equals(typeof(bool)) && cell.ColumnIndex == 4 && (bool)cell.Value == true)
-                                {
-                                    dbMethods.myTable += $" AUTO_INCREMENT";
-                                    dbMethods.myPrimaryKey = $"CONSTRAINT ID_{txtNomTable.Text}_ID PRIMARY KEY (`{dbMethods.myPrimaryKeyName}`)";
-                                }
-                                //IF a null checkbox is checked
-                                else if (cellType.Equals(typeof(bool)) && cell.ColumnIndex == 3 && (bool)cell.Value == false)
-                                {
-                                    dbMethods.myTable += $" NOT NULL";
-                                }
-                                //The others
-                                else if (cell.ColumnIndex == 0)
-                                {
-                                    dbMethods.myTable += $"`{cell.Value}` ";
-                                    dbMethods.myPrimaryKeyName = (string)cell.Value;
-                                }
-                                else if (cell.ColumnIndex == 1)
-                                {
-                                    dbMethods.myTable += $"{cell.Value}";
-                                }
-                                else if (cell.ColumnIndex == 2)
-                                {
-                                    dbMethods.myTable += $"({cell.Value})";
-                                }
+                                dbMethods.myTable += $" AUTO_INCREMENT";
+                                dbMethods.myPrimaryKey = $"CONSTRAINT ID_{txtNomTable.Text}_ID PRIMARY KEY (`{dbMethods.myPrimaryKeyName}`)";
                             }
-                            catch (NullReferenceException) { };
+                            //IF a null checkbox is checked
+                            else if (cellType.Equals(typeof(bool)) && cell.ColumnIndex == 3 && (bool)cell.Value == true)
+                            {
+                                dbMethods.myTable += $" NULL";
+                            }
+                            //The others
+                            else if (cell.ColumnIndex == 0)
+                            {
+                                dbMethods.myTable += $"`{cell.Value}` ";
+                                dbMethods.myPrimaryKeyName = (string)cell.Value;
+                            }
+                            else if (cell.ColumnIndex == 1)
+                            {
+                                dbMethods.myTable += $"{cell.Value}";
+                            }
+                            else if (cell.ColumnIndex == 2)
+                            {
+                                dbMethods.myTable += $"({cell.Value})";
+                            }
                         }
-
+                        catch (NullReferenceException) { };
+                    }
+                    //Add a comma to the end ofthe row
                     if (row != dgvData.Rows[dgvData.RowCount - 1])
                     {
                         dbMethods.myTable += ",\n";
                     }
-                        
                 }
 
                 dbMethods.myTable += $"{dbMethods.myPrimaryKey}\n";
@@ -258,10 +255,11 @@ namespace Projet_MySQL
                 Console.WriteLine(dbMethods.myTable);
             }
 
-            //Show the result of the request in sql "style"
-            MessageBox.Show(dbMethods.myTable);
-
+            //Create a command
             dbMethods.CreateACommand(dbMethods.myTable);
+            dbMethods.canCreate = false;
+            dgvData.Rows.Clear();
+            dgvData.Refresh();
         }
 
 
@@ -308,12 +306,66 @@ namespace Projet_MySQL
 
                         MessageBox.Show($"Vous avez bien supprimé la table {txtNomTable.Text} !", "Confirmation");
                     }
-                    else { }
-
                 }
                 catch (Exception)
                 {
                     dbErrors.CreateErrorMessage("La base de donnée que vous essayez de supprimer n'existe pas !!!");
+                }
+            }
+        }
+
+        /// <summary>
+        /// If the database text change
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">E</param>
+        private void TxtNomDb_TextChanged(object sender, EventArgs e)
+        {
+            if (dbMethods.isConnected == true)
+            {
+                if (txtNomDb.Text != null)
+                {
+                    //Disable buttons
+                    if (string.IsNullOrWhiteSpace(txtNomDb.Text))
+                    {
+                        btnAddDb.Enabled = false;
+                        btnDeleteDb.Enabled = false;
+                    }
+                    else//Enable buttons
+                    {
+                        btnAddDb.Enabled = true;
+                        btnDeleteDb.Enabled = true;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// If the table text change
+        /// </summary>
+        /// <param name="sender">Sender</param>
+        /// <param name="e">E</param>
+        private void TxtNomTable_TextChanged(object sender, EventArgs e)
+        {
+            if (dbMethods.isConnected == true)
+            {
+                if (txtNomTable.Text != null)
+                {
+                    //Disable buttons
+                    if (string.IsNullOrWhiteSpace(txtNomTable.Text))
+                    {
+                        btnCreateTable.Enabled = false;
+                        btnDeleteTable.Enabled = false;
+                        if (dbMethods.canCreate == true)
+                            btnFinaliser.Enabled = false;
+                    }
+                    else//Enable buttons
+                    {
+                        btnCreateTable.Enabled = true;
+                        btnDeleteTable.Enabled = true;
+                        if (dbMethods.canCreate == true)
+                            btnFinaliser.Enabled = true;
+                    }
                 }
             }
         }

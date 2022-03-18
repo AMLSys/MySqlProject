@@ -2,6 +2,9 @@
 
 namespace Projet_MySQL.Errors
 {
+    /// <summary>
+    /// Errors class
+    /// </summary>
     public static class dbErrors
     {
         /// <summary>

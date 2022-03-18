@@ -1,6 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using Projet_MySQL.Errors;
-using Rhino.Mocks.Constraints;
 using System;
 using System.Data;
 using System.Resources;
@@ -8,10 +6,13 @@ using System.Windows.Forms;
 
 namespace Projet_MySQL.Database
 {
+    /// <summary>
+    /// All methods class
+    /// </summary>
     public class dbMethods
     {
         //Variables used in all the program
-        public bool isConnected = false;
+        public bool isConnected = false, canCreate = false;
         public MySqlConnection myConnection = new MySqlConnection();
         public string myTable, myPrimaryKey, myPrimaryKeyName, myConnectionString;
         public int myNbLine = 0;
@@ -82,13 +83,19 @@ namespace Projet_MySQL.Database
             }
         }
 
+        /// <summary>
+        /// Disable all buttons except the "btnConnect" button
+        /// </summary>
+        /// <param name="myForm">The form the all the buttons are</param>
         public void Disconnect(Form myForm)
         {
+            //Find all the controls in the form
             foreach (Control aControl in myForm.Controls)
             {
-                if (StartsWith(aControl.Name, "btn");
+                //Descactivate all the buttons
+                if (aControl.Name.StartsWith("btn") && aControl.Name != "btnConnect")
+                    aControl.Enabled = false;
             }
-
         }
 
         /// <summary>
@@ -121,7 +128,6 @@ namespace Projet_MySQL.Database
         {
             myConnectionString = $"Server=localhost;Uid=root;Pwd=root;Database={connectionString};Charset=latin1";
             myConnection = new MySqlConnection(myConnectionString);
-            
         }
     }
 }

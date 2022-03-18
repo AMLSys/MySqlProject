@@ -81,6 +81,7 @@
             this.txtNomTable.Name = "txtNomTable";
             this.txtNomTable.Size = new System.Drawing.Size(283, 20);
             this.txtNomTable.TabIndex = 3;
+            this.txtNomTable.TextChanged += new System.EventHandler(this.TxtNomTable_TextChanged);
             // 
             // dgvData
             // 
@@ -169,6 +170,7 @@
             this.txtNomDb.Name = "txtNomDb";
             this.txtNomDb.Size = new System.Drawing.Size(283, 20);
             this.txtNomDb.TabIndex = 12;
+            this.txtNomDb.TextChanged += new System.EventHandler(this.TxtNomDb_TextChanged);
             // 
             // lblDB
             // 
@@ -199,8 +201,11 @@
             this.Controls.Add(this.btnAddDb);
             this.Controls.Add(this.lblIsConnected);
             this.Controls.Add(this.btnConnect);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "frmDatabase";
-            this.Text = "Form1";
+            this.Text = "Gérer la base de donnée";
             ((System.ComponentModel.ISupportInitialize)(this.dgvData)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
